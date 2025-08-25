@@ -9,7 +9,9 @@ export default async function AddTransactionPage({ searchParams }) {
   return (
     <div className="max-w-3xl mx-auto px-5">
       <div className="flex justify-center md:justify-normal mb-8">
-        <h1 className="text-5xl gradient-title bg-gradient-to-br from-gray-900 to-gray-500 text-transparent">Add Transaction</h1>
+        <h1 className="mx-auto text-4xl md:text-4xl lg:text-[90px] pb-6 font-extrabold tracking-tighter bg-gradient-to-br from-blue-600 to-purple-600 text-transparent bg-clip-text">
+          Add  Transaction
+        </h1>
       </div>
       <AddTransactionForm
         accounts={accounts}
