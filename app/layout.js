@@ -5,7 +5,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "sonner";
 import Link from "next/link";
 
-const inter = Inter({ subsets: ["latin"] }); // 👈 fixed here
+const inter = Inter({ subsets: ["latin"] }); 
 
 export const metadata = {
   title: "Aura",
