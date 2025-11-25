@@ -5,6 +5,7 @@ import { db } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
+
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const serializeAmount = (obj) => ({
   ...obj,
@@ -164,6 +165,8 @@ export async function updateTransaction(id, data) {
 }
 
 
+
+
 // Scan Receipt
 export async function scanReceipt(file) {
   try {
@@ -226,6 +229,87 @@ export async function scanReceipt(file) {
     throw new Error("Failed to scan receipt");
   }
 }
+
+// Voice Transaction
+export async function processVoiceTransaction(audioFile) {
+  try {
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+    const arrayBuffer = await audioFile.arrayBuffer();
+    const base64String = Buffer.from(arrayBuffer).toString("base64");
+
+    const prompt = `
+      You are a multilingual voice transaction interpreter.
+      The user's voice (in any language) describes a financial transaction.
+
+      Your job:
+      1. Translate the voice into English.
+      2. Extract structured transaction details in JSON.
+      3. If the statement is not a transaction (like a greeting or noise), return an empty object {}.
+
+      Respond **only** with valid JSON — no markdown, no explanations, no code blocks.
+
+      Format:
+      {
+        "amount": number,
+        "date": "ISO date string",
+        "description": "string",
+        "merchantName": "string",
+        "category": "string"
+      }
+
+      Example:
+      Input: "I booked movie tickets for 596 rupees yesterday"
+      Output:
+      {
+        "amount": 596,
+        "date": "2025-10-30",
+        "description": "movie tickets",
+        "merchantName": "PVR Cinemas",
+        "category": "entertainment"
+      }
+    `;
+
+    const result = await model.generateContent([
+      {
+        inlineData: {
+          data: base64String,
+          mimeType: audioFile.type,
+        },
+      },
+      prompt,
+    ]);
+
+    const response = await result.response;
+    const text = response.text().replace(/```(?:json)?\n?/g, "").trim();
+
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (err) {
+      console.error("Voice JSON parse error:", text);
+      throw new Error("Invalid response format from Gemini");
+    }
+
+    if (!data || Object.keys(data).length === 0) {
+      console.warn("No transaction detected in voice input");
+      return {};
+    }
+
+    return {
+      amount: parseFloat(data.amount),
+      date: new Date(data.date),
+      description: data.description,
+      category: data.category,
+      merchantName: data.merchantName,
+    };
+  } catch (error) {
+    console.error("Voice processing error:", error);
+    throw new Error("Failed to process voice transaction");
+  }
+}
+
+
 
 // Helper function to calculate next recurring date
 function calculateNextRecurringDate(startDate, interval) {

@@ -30,6 +30,7 @@ import { cn } from "@/lib/utils";
 import { createTransaction, updateTransaction } from "@/actions/transaction";
 import { transactionSchema } from "@/lib/schema";
 import { ReceiptScanner } from "./recipt-scanner";
+import { VoiceTransactionRecorder } from "./VoiceTransactionRecorder";
 
 export function AddTransactionForm({
   accounts,
@@ -132,6 +133,10 @@ export function AddTransactionForm({
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 hover:cursor-pointer">
       {/* Receipt Scanner - Only show in create mode */}
       {!editMode && <ReceiptScanner onScanComplete={handleScanComplete} />}
+
+      {/* Voice based transaction  */}
+      {!editMode && <VoiceTransactionRecorder onScanComplete={handleScanComplete} />}
+
 
       {/* Type */}
       <div className="space-y-2">

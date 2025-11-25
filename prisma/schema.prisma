@@ -10,9 +10,10 @@ generator client {
 
 
 datasource db {
-  provider   = "postgresql"
-  url        = env("DATABASE_URL")  // for normal queries (PgBouncer)
-  directUrl  = env("DIRECT_URL")    // for migrations (direct port 5432)
+  provider = "postgresql"
+  // Connection URLs for Migrate and the Prisma Client are no longer supported in schema files.
+  // Move migration connection URLs to prisma.config.ts and pass adapter or accelerateUrl to the PrismaClient.
+  // See: https://pris.ly/d/config-datasource and https://pris.ly/d/prisma7-client-config
 }
 
 
