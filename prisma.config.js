@@ -1,9 +1,7 @@
 
-
+// prisma.config.js
 module.exports = {
-    schema: "./prisma/schema.prisma",
-    datasource: {
-        ul : process.env.DATABASE_URL,
-        directUrl: process.env.DIRECT_URL
-    }
-}
+  schema: "./prisma/schema.prisma",
+  output: "./generated",
+};
+
